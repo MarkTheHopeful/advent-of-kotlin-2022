@@ -13,8 +13,7 @@ fun main() {
             if (element.isBlank()) {
                 list.add(0)
                 list
-            }
-            else {
+            } else {
                 list[list.size - 1] += element.toInt()
                 list
             }
