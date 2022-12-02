@@ -15,13 +15,15 @@ fun win(t: Shape): Shape {
 }
 
 fun outcome(my: Shape, other: Shape): Outcome {
-    if (my == other) return Outcome.DRAW
-    if (my == win(other)) return Outcome.WIN
-    return Outcome.LOSE
+    return when (my) {
+        other -> Outcome.DRAW
+        win(other) -> Outcome.WIN
+        else -> Outcome.LOSE
+    }
 }
 
 fun main() {
-    val toTurn = mapOf(
+    val toShape = mapOf(
         Pair('A', Shape.ROCK),
         Pair('X', Shape.ROCK),
         Pair('B', Shape.PAPER),
@@ -34,27 +36,25 @@ fun main() {
     )
 
     fun part1(input: List<String>): Int {
-        var totalScore = 0
-        for (line in input) {
-            totalScore += outcome(toTurn[line[2]]!!, toTurn[line[0]]!!).score + toTurn[line[2]]!!.score
+        return input.fold(0) { score, line ->
+            score + outcome(
+                toShape[line[2]]!!,
+                toShape[line[0]]!!
+            ).score + toShape[line[2]]!!.score
         }
-        return totalScore
     }
 
     fun part2(input: List<String>): Int {
-        var totalScore = 0
-        for (line in input) {
+        return input.fold(0) {score, line ->
             val desired = toOutcome[line[2]]!!
-            val opponent = toTurn[line[0]]!!
-            totalScore += desired.score
-            val myTurn = when (desired) {
+            val opponent = toShape[line[0]]!!
+            val myShape = when (desired) {
                 Outcome.DRAW -> opponent
                 Outcome.WIN -> win(opponent)
                 Outcome.LOSE -> win(win(opponent))
             }
-            totalScore += myTurn.score
+            score + myShape.score + desired.score
         }
-        return totalScore
     }
 
     // test if implementation meets criteria from the description, like:
