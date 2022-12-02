@@ -6,6 +6,22 @@ enum class Outcome(val score: Int) {
     WIN(6), DRAW(3), LOSE(0)
 }
 
+val Char.shape: Shape
+    get() = when (this) {
+        'A', 'X' -> Shape.ROCK
+        'B', 'Y' -> Shape.PAPER
+        'C', 'Z' -> Shape.SCISSORS
+        else -> error("AX BY CZ")
+    }
+
+val Char.outcome: Outcome
+    get() = when (this) {
+        'X' -> Outcome.LOSE
+        'Y' -> Outcome.DRAW
+        'Z' -> Outcome.WIN
+        else -> error("XYZ")
+    }
+
 fun win(t: Shape): Shape {
     return when (t) {
         Shape.ROCK -> Shape.PAPER
@@ -22,40 +38,19 @@ fun outcome(my: Shape, other: Shape): Outcome {
     }
 }
 
+fun applyOutcomeFor(outcome: Outcome, opponent: Shape): Shape = when (outcome) {
+    Outcome.DRAW -> opponent
+    Outcome.WIN -> win(opponent)
+    Outcome.LOSE -> win(win(opponent))
+}
+
 fun main() {
-    val toShape = mapOf(
-        Pair('A', Shape.ROCK),
-        Pair('X', Shape.ROCK),
-        Pair('B', Shape.PAPER),
-        Pair('Y', Shape.PAPER),
-        Pair('C', Shape.SCISSORS),
-        Pair('Z', Shape.SCISSORS)
-    )
-    val toOutcome = mapOf(
-        Pair('X', Outcome.LOSE), Pair('Y', Outcome.DRAW), Pair('Z', Outcome.WIN)
-    )
+    fun part1(input: List<String>): Int = input.map { line -> Pair(line[0].shape, line[2].shape) }
+        .sumOf { (opponent, me) -> me.score + outcome(me, opponent).score }
 
-    fun part1(input: List<String>): Int {
-        return input.fold(0) { score, line ->
-            score + outcome(
-                toShape[line[2]]!!,
-                toShape[line[0]]!!
-            ).score + toShape[line[2]]!!.score
-        }
-    }
 
-    fun part2(input: List<String>): Int {
-        return input.fold(0) {score, line ->
-            val desired = toOutcome[line[2]]!!
-            val opponent = toShape[line[0]]!!
-            val myShape = when (desired) {
-                Outcome.DRAW -> opponent
-                Outcome.WIN -> win(opponent)
-                Outcome.LOSE -> win(win(opponent))
-            }
-            score + myShape.score + desired.score
-        }
-    }
+    fun part2(input: List<String>): Int = input.map { line -> Pair(line[0].shape, line[2].outcome) }
+        .sumOf { (opponent, outcome) -> outcome.score + applyOutcomeFor(outcome, opponent).score }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day02_test")
