@@ -1,19 +1,8 @@
 fun main() {
-    fun readCrates(input: List<String>): MutableList<MutableList<Char>> {
-        val crates: MutableList<MutableList<Char>> = mutableListOf()
+    fun readCrates(input: List<String>): List<MutableList<Char>> {
+        val crates: List<MutableList<Char>> = List((input.last().length + 2) / 4) { mutableListOf() }
         for (line in input) {
-            if (line.isBlank()) {
-                break
-            }
-            val blocks = (line.length + 1) / 4
-            while (blocks > crates.size) {
-                crates.add(mutableListOf())
-            }
-            for (i in 1..line.length step 4) {
-                if (line[i].isLetter()) {
-                    crates[i / 4].add(line[i])
-                }
-            }
+            line.chunked(4).forEachIndexed { index, part -> if (part[1].isLetter()) crates[index].add(part[1]) }
         }
         for (i in crates.indices) {
             crates[i].reverse()
@@ -21,14 +10,12 @@ fun main() {
         return crates
     }
 
-    fun workOnCrates(
-        input: List<String>,
-        moveOperation: (MutableList<MutableList<Char>>, Int, Int, Int) -> Unit
-    ): String {
-        val crates = readCrates(input)
+    fun workOnCrates(input: List<String>, moveOperation: (List<MutableList<Char>>, Int, Int, Int) -> Unit): String {
+        val (cratesLines, commandLines) = input.joinToString("/n").split("/n/n").map { it.split("/n") }
+        val crates = readCrates(cratesLines)
 
-        for (command in input.subList(input.indexOfFirst { s -> s.isBlank() } + 1, input.size)) {
-            val (amount, from, to) = command.split(" ").filterIndexed { ind, _ -> ind % 2 == 1 }.map { x -> x.toInt() }
+        for (command in commandLines) {
+            val (amount, from, to) = command.split(" ").mapNotNull(String::toIntOrNull)
             moveOperation(crates, amount, from - 1, to - 1)
         }
 
@@ -36,7 +23,7 @@ fun main() {
     }
 
     fun part1(input: List<String>): String {
-        return workOnCrates(input) { crates: MutableList<MutableList<Char>>, amount, from, to ->
+        return workOnCrates(input) { crates: List<MutableList<Char>>, amount, from, to ->
             repeat(amount) {
                 crates[to].add(crates[from].removeLast())
             }
@@ -44,7 +31,7 @@ fun main() {
     }
 
     fun part2(input: List<String>): String {
-        return workOnCrates(input) { crates: MutableList<MutableList<Char>>, amount, from, to ->
+        return workOnCrates(input) { crates: List<MutableList<Char>>, amount, from, to ->
             val tail = crates[from].takeLast(amount)
             repeat(amount) {
                 crates[from].removeLast()
