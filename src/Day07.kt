@@ -32,11 +32,11 @@ class Node(private val parent: Node?, var size: Int, private val type: TYPE) {
     fun smallestNotLessThan(value: Int): Int {
         return min(
             (if (size >= value && type == TYPE.DIR) size else Int.MAX_VALUE),
-            if (children.isEmpty()) Int.MAX_VALUE else children.values.minOf { node ->
+            children.values.minOfOrNull { node ->
                 node.smallestNotLessThan(
                     value
                 )
-            })
+            } ?: Int.MAX_VALUE)
     }
 }
 
@@ -44,27 +44,25 @@ fun main() {
     fun createFilesystem(input: List<String>): Node {
         val root = Node(null, 0, Node.TYPE.DIR)
         var currentNode = root
-        for (line in input) {
-            if (line.startsWith("$")) {
-                if (line.split(" ")[1] == "ls") {
-                    continue
+        input.forEach {
+            when {
+                it.startsWith("$ ls") -> {}
+                it.startsWith("$ cd") -> {
+                    currentNode = when (val newDir = it.split(" ")[2]) {
+                        ".." -> currentNode.getRealParent()
+                        "/" -> root
+                        else -> currentNode.children[newDir] ?: error("Child not registered")
+                    }
                 }
-                val newDir = line.split(" ")[2]
-                currentNode = when (newDir) {
-                    ".." -> currentNode.getRealParent()
-                    "/" -> root
-                    else -> currentNode.children[newDir] ?: error("Child not registered")
+
+                else -> {
+                    val (typeOrSize, name) = it.split(" ")
+                    if (name !in currentNode.children) {
+                        currentNode.children[name] =
+                            if (typeOrSize == "dir") Node(currentNode, 0, Node.TYPE.DIR) else
+                                Node(currentNode, typeOrSize.toInt(), Node.TYPE.FILE)
+                    }
                 }
-            } else {
-                val (typeOrSize, name) = line.split(" ")
-                if (name in currentNode.children) {
-                    continue
-                }
-                currentNode.children[name] = Node(
-                    currentNode, if (typeOrSize == "dir") 0 else {
-                        typeOrSize.toInt()
-                    }, if (typeOrSize == "dir") Node.TYPE.DIR else Node.TYPE.FILE
-                )
             }
         }
         root.recalculateSize()
