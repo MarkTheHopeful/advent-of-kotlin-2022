@@ -15,28 +15,20 @@ class Node(private val parent: Node?, var size: Int, private val type: TYPE) {
         if (type == TYPE.DIR) {
             size = 0
         }
-        for (child in children) {
-            size += child.value.recalculateSize()
-        }
+        size += children.values.sumOf {it.recalculateSize()}
         return size
     }
 
     fun sumOfNotGreaterThan(value: Int): Int {
         return (if (size <= value && type == TYPE.DIR) size else 0) + children.values.sumOf { node ->
-            node.sumOfNotGreaterThan(
-                value
-            )
+            node.sumOfNotGreaterThan(value)
         }
     }
 
     fun smallestNotLessThan(value: Int): Int {
         return min(
-            (if (size >= value && type == TYPE.DIR) size else Int.MAX_VALUE),
-            children.values.minOfOrNull { node ->
-                node.smallestNotLessThan(
-                    value
-                )
-            } ?: Int.MAX_VALUE)
+            if (size >= value && type == TYPE.DIR) size else Int.MAX_VALUE,
+            children.values.minOfOrNull { node -> node.smallestNotLessThan(value) } ?: Int.MAX_VALUE)
     }
 }
 
@@ -59,7 +51,8 @@ fun main() {
                     val (typeOrSize, name) = it.split(" ")
                     if (name !in currentNode.children) {
                         currentNode.children[name] =
-                            if (typeOrSize == "dir") Node(currentNode, 0, Node.TYPE.DIR) else
+                            if (typeOrSize == "dir")
+                                Node(currentNode, 0, Node.TYPE.DIR) else
                                 Node(currentNode, typeOrSize.toInt(), Node.TYPE.FILE)
                     }
                 }
