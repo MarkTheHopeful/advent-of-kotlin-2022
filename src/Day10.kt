@@ -1,22 +1,18 @@
 fun main() {
-    fun part1(input: List<String>): Int {
-        var answer = 0
-        var current = 1
-        var cycleNum = 1
+    fun toValues(input: List<String>): List<Int> {
+        val current = mutableListOf(1)
         input.forEach {
-            cycleNum++
+            current.add(current.last())
             if (it.startsWith("addx")) {
-                if (cycleNum % 40 == 20 && cycleNum <= 220) {
-                    answer += current * cycleNum
-                }
-                current += it.split(" ")[1].toInt()
-                cycleNum++
-            }
-            if (cycleNum % 40 == 20 && cycleNum <= 220) {
-                answer += current * cycleNum
+                current.add(current.last() + it.split(" ")[1].toInt())
             }
         }
-        return answer
+        return current
+    }
+
+    fun part1(input: List<String>): Int {
+        return toValues(input).withIndex().filter { (it.index + 1) % 40 == 20 && it.index <= 220 }
+            .sumOf { (it.index + 1) * it.value }
     }
 
     fun whatToPrint(cycleNum: Int, current: Int): Char {
@@ -28,25 +24,9 @@ fun main() {
     }
 
     fun part2(input: List<String>): String {
-        val screen = MutableList(6) { StringBuilder() }
-        var current = 1
-        var cycleNum = 0
-        input.forEach {
-            cycleNum++
-            when {
-                it.startsWith("addx") -> {
-                    screen[cycleNum / 40].append(whatToPrint(cycleNum, current))
-                    cycleNum++
-                    screen[cycleNum / 40].append(whatToPrint(cycleNum, current))
-                    current += it.split(" ")[1].toInt()
-                }
-
-                else -> {
-                    screen[cycleNum / 40].append(whatToPrint(cycleNum, current))
-                }
-            }
-        }
-        return screen.joinToString("\n") { it.toString() }
+        return toValues(input).dropLast(1).asSequence().withIndex().map {
+            whatToPrint(it.index + 1, it.value)
+        }.chunked(40).map { it.joinToString("") }.joinToString("\n")
     }
 
     // test if implementation meets criteria from the description, like:
