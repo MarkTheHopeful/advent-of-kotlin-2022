@@ -2,24 +2,12 @@ import kotlin.math.sign
 import kotlin.math.min
 import kotlin.math.max
 
+
 private const val EMPTY = 0
 private const val BLOCKED = 1
 private val MOVES_SAND = listOf(0 to 1, -1 to 1, 1 to 1)
 
-private operator fun <T> List<List<T>>.get(pair: Pair<Int, Int>) = this[pair.first][pair.second]
-private operator fun <E> MutableList<MutableList<E>>.set(xy: Pair<Int, Int>, value: E) {
-    this[xy.first][xy.second] = value
-}
-
-private operator fun Pair<Int, Int>.minus(other: Pair<Int, Int>): Pair<Int, Int> {
-    return (this.first - other.first) to (this.second - other.second)
-}
-
-private operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> {
-    return (this.first + other.first) to (this.second + other.second)
-}
-
-class Field(walls: List<List<Pair<Int, Int>>>, blockVoid: Boolean = false) {
+private class Field(walls: List<List<Pair<Int, Int>>>, blockVoid: Boolean = false) {
     enum class MoveResultState { MOVED, BLOCKED, FREE }
     inner class MoveResult(val state: MoveResultState, val newPoint: Pair<Int, Int>? = null)
 

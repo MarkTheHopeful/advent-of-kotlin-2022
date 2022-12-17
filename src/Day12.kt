@@ -2,15 +2,6 @@ import java.util.*
 
 private val dirs: List<Pair<Int, Int>> = listOf(0 to 1, 0 to -1, 1 to 0, -1 to 0)
 
-private operator fun <T> List<List<T>>.get(pair: Pair<Int, Int>) = this[pair.first][pair.second]
-private operator fun <E> MutableList<MutableList<E>>.set(xy: Pair<Int, Int>, value: E) {
-    this[xy.first][xy.second] = value
-}
-
-private operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> {
-    return (this.first + other.first) to (this.second + other.second)
-}
-
 fun main() {
     fun bfs(graphHeights: List<List<Int>>, start: List<Pair<Int, Int>>, finish: Pair<Int, Int>): Int {
         val n = graphHeights.size
