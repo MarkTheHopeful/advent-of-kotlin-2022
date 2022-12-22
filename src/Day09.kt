@@ -2,7 +2,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sign
 
-val MOVES: Map<Char, Pair<Int, Int>> =
+private val MOVES: Map<Char, Pair<Int, Int>> =
     mapOf(Pair('U', Pair(0, 1)), Pair('D', Pair(0, -1)), Pair('L', Pair(-1, 0)), Pair('R', Pair(1, 0)))
 
 fun main() {

@@ -1,6 +1,6 @@
 import kotlin.math.min
 
-class Node(private val parent: Node?, var size: Int, private val type: TYPE) {
+private class Node(private val parent: Node?, var size: Int, private val type: TYPE) {
     enum class TYPE {
         FILE, DIR
     }

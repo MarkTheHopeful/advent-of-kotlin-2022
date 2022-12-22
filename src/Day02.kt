@@ -1,12 +1,12 @@
-enum class Shape(val score: Int) {
+private enum class Shape(val score: Int) {
     ROCK(1), PAPER(2), SCISSORS(3)
 }
 
-enum class Outcome(val score: Int) {
+private enum class Outcome(val score: Int) {
     WIN(6), DRAW(3), LOSE(0)
 }
 
-val Char.shape: Shape
+private val Char.shape: Shape
     get() = when (this) {
         'A', 'X' -> Shape.ROCK
         'B', 'Y' -> Shape.PAPER
@@ -14,7 +14,7 @@ val Char.shape: Shape
         else -> error("AX BY CZ")
     }
 
-val Char.outcome: Outcome
+private val Char.outcome: Outcome
     get() = when (this) {
         'X' -> Outcome.LOSE
         'Y' -> Outcome.DRAW
@@ -22,7 +22,7 @@ val Char.outcome: Outcome
         else -> error("XYZ")
     }
 
-fun win(t: Shape): Shape {
+private fun win(t: Shape): Shape {
     return when (t) {
         Shape.ROCK -> Shape.PAPER
         Shape.PAPER -> Shape.SCISSORS
@@ -30,7 +30,7 @@ fun win(t: Shape): Shape {
     }
 }
 
-fun outcome(my: Shape, other: Shape): Outcome {
+private fun outcome(my: Shape, other: Shape): Outcome {
     return when (my) {
         other -> Outcome.DRAW
         win(other) -> Outcome.WIN
@@ -38,7 +38,7 @@ fun outcome(my: Shape, other: Shape): Outcome {
     }
 }
 
-fun applyOutcomeFor(outcome: Outcome, opponent: Shape): Shape = when (outcome) {
+private fun applyOutcomeFor(outcome: Outcome, opponent: Shape): Shape = when (outcome) {
     Outcome.DRAW -> opponent
     Outcome.WIN -> win(opponent)
     Outcome.LOSE -> win(win(opponent))
